@@ -243,8 +243,9 @@ def process_case(case_dir: Path, output_root: Path, args: argparse.Namespace) ->
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Preprocess shadowgraph TIFFs and compute SPOD for all h/D-NPR cases.")
     parser.add_argument("--input-root", type=Path, default=Path("RP"), help="Root containing hD*/NPR* TIFF folders.")
-    parser.add_argument("--output-root", type=Path, default=Path("SPOD_results"), help="Separate directory for all outputs.")
-    parser.add_argument("--dt", type=float, required=True, help="Time between frames in seconds; required for physical frequencies.")
+    parser.add_argument("--output-root", type=Path, default=Path("RP") / "SPODResultsCodex" / "results", help="Separate directory for all outputs.")
+    parser.add_argument("--fps", type=float, default=22000.0, help="Camera frame rate in frames per second; default is 22000 fps.")
+    parser.add_argument("--dt", type=float, help="Optional time between frames in seconds. Overrides --fps when provided.")
     parser.add_argument("--hds", nargs="*", help="Optional subset, e.g. 2 4 6 8 10 12 20 or hD2 hD4.")
     parser.add_argument("--nprs", nargs="*", help="Optional subset, e.g. 2.5 3.67 5.0 or NPR2p5.")
     parser.add_argument("--max-frames", type=int, help="Optional limit for trial runs.")
@@ -261,6 +262,8 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.dt is None:
+        args.dt = 1.0 / args.fps
     if not args.input_root.exists():
         raise SystemExit(f"Input root not found: {args.input_root}")
     cases = discover_cases(args.input_root, args.hds, args.nprs)

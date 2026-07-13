@@ -32,21 +32,28 @@ pip install -r requirements.txt
 
 ## Run the full campaign
 
-You must provide the camera frame spacing `dt` in seconds so SPOD frequencies are reported in Hz:
+The camera frame rate defaults to `22000` fps, so the default frame spacing is computed as `1/22000` s and SPOD frequencies are reported in Hz. From the current repository folder, run:
 
 ```bash
-python scripts/shadowgraph_spod_pipeline.py --input-root RP --output-root SPOD_results --dt 1.0e-5
+python scripts/shadowgraph_spod_pipeline.py
+```
+
+This reads `RP/hD*/NPR*/*.tif` and saves results under `RP/SPODResultsCodex/results/`. If you need to override the frame rate or supply frame spacing directly, use `--fps` or `--dt`: 
+
+```bash
+python scripts/shadowgraph_spod_pipeline.py --fps 22000
+python scripts/shadowgraph_spod_pipeline.py --dt 4.545454545e-5
 ```
 
 For a quick trial on a small subset:
 
 ```bash
-python scripts/shadowgraph_spod_pipeline.py --input-root RP --output-root SPOD_trial --dt 1.0e-5 --hds 2 --nprs 2.5 --max-frames 300
+python scripts/shadowgraph_spod_pipeline.py --output-root RP/SPODResultsCodex/trial --hds 2 --nprs 2.5 --max-frames 300
 ```
 
 ## What is saved for each h/D and NPR case
 
-Each case is written to `SPOD_results/<hD>/<NPR>/` with:
+Each case is written to `RP/SPODResultsCodex/results/<hD>/<NPR>/` by default, with:
 
 - `mean_raw.png`: time-averaged raw shadowgraph image.
 - `flat_field_background.png`: low-pass background/illumination estimate used for correction.
@@ -87,4 +94,4 @@ The implementation uses a Welch/block SPOD formulation with a Hann window and ov
 - `--max-modes`: number of SPOD modes saved at each frequency.
 - `--save-top-frequencies`: number of frequencies with the largest first-mode energy exported as PNG mode figures.
 
-For journal-quality comparisons, keep preprocessing and SPOD settings identical across all NPR and h/D cases, and report `dt`, `nperseg`, overlap, image resolution, number of frames, and any cropping or masking applied outside this script.
+For journal-quality comparisons, keep preprocessing and SPOD settings identical across all NPR and h/D cases, and report the `22000` fps acquisition rate, computed `dt`, `nperseg`, overlap, image resolution, number of frames, and any cropping or masking applied outside this script.
